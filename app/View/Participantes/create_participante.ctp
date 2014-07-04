@@ -1,0 +1,1 @@
+<?php echo "{estado:'$estado',data:".json_encode($data)."}" ?>

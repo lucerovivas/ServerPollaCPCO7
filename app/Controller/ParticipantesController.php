@@ -48,6 +48,8 @@ class ParticipantesController extends AppController {
 	public function add() {
 		if ($this->request->is('post')) {
 			$this->Participante->create();
+			print_r($this->request->data);
+			exit(1);
 			if ($this->Participante->save($this->request->data)) {
 				$this->Session->setFlash(__('The participante has been saved.'));
 				return $this->redirect(array('action' => 'index'));
@@ -100,5 +102,51 @@ class ParticipantesController extends AppController {
 			$this->Session->setFlash(__('The participante could not be deleted. Please, try again.'));
 		}
 		return $this->redirect(array('action' => 'index'));
+	}
+
+	public function createParticipante(){
+		$this->layout = 'ajax';
+
+		$data_post = $this->request->data;
+		if (isset($data_post) and !empty($data_post)) {
+			
+			$cedula     = $data_post["cedula"];
+
+
+			$this->Participante->recursive = 0;
+			$existe = $this->Participante->find('first',array(
+				'fields' =>array('cedula','nick','colombia','brasil','ganador'),
+				'conditions' => array('cedula' => $cedula)
+				));
+
+			if (empty($existe)) {
+				$nick   	=$data_post["nick"];
+			    $colombia   =$data_post["colombia"];
+			    $brasil     =$data_post["brasil"];
+			    $ganador    =$data_post["ganador"];
+
+			    $participante["Participante"] = array(
+					'cedula' => $cedula, 
+					'nick' => $nick,
+					'colombia' => $colombia,
+					'brasil' => $brasil,
+					'ganador' => $ganador,
+				);
+
+			    $this->Participante->save($participante);	
+				$this->set("estado","nuevo");
+			    $this->set("data",$participante);
+			}else{
+				$this->set("estado","existe");
+				$this->set("data",$existe);
+			}
+
+		    
+
+		}
+
+			
+
+		
 	}
 }
